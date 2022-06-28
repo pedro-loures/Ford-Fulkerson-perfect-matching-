@@ -3,7 +3,7 @@
 # Description: implementation of ford fulkerson with bfs to generate perfect matchings in a bipartite grapgh
 # TODO LIST
 # -0 TODO implement graph structure
-# -1 TODO Read entry
+# -1 OK Read entry
 # -2 TODO implement bfs
 # -3 TODO implement ford fulkerson
 # -4 TODO check perfect matching
@@ -20,6 +20,7 @@ import utils as ut
 
 
 def main():
+  ut.read_input()
   pass
 
 
