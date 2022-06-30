@@ -20,7 +20,8 @@ import utils as ut
 
 
 def main():
-  ut.read_input()
+  graph = ut.read_input()
+  gs.bfs(graph, 0)
   pass
 
 

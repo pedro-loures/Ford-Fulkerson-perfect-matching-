@@ -11,12 +11,19 @@ import utils as ut
 
 # Read input and create graph
 def read_input(text=''):
+  # First line [0] - lines, columns
   lines, columns = [int(valor) for valor in input(text).split(' ')]
+  
+  # Second to Second to last [1:-1] - matrix
   matrixQ=[]
   for _ in range(lines*2):
-    linha = input().split(' ')
+    linha = [int(valor) for valor in input().split(' ')]
     matrixQ.append(linha)
-  cost = input().split(' ')
-  gs.make_graph(lines, columns, matrixQ, cost)
-  return
+
+  # Last line [-1] - cost of edges
+  cost = [int(valor) for valor in input().split(' ')]
+
+  # Make a graph
+  graph = gs.make_graph(matrixQ, cost, lines, columns)
+  return graph
 

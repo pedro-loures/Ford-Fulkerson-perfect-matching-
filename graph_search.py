@@ -26,24 +26,54 @@ import utils as ut
 '''
 
 def assert_matrix(matrixQ):
-  # asssert 1 in more than one columns 
+  # asssert 1 in more than one columns
   pass
 
 
-
-def make_graph(lines, columns, matrixQ, cost):
+# make graph structure from the matrix given before (can be optimized)
+def make_graph(matrixQ, cost, lines=None, columns=None):
   np_matrixQ = np.array(matrixQ).transpose()
-  print(np_matrixQ)
   graph = {}
-  print(cost)
-  for _counter, edge in enumerate(matrixQ):
-    print(_counter)
-    print(cost[_counter])
-    for _node in edge:
-      if _node == 1:
-        pass
-      
-  # print(lines, columns)
-  # print(matrixQ)
-  # print(cost)
+  
+  # Iterate through Edges 
+  for _counter, edge in enumerate(np_matrixQ):
+    _from = None
+    _to = None
+
+    # Iterate throu vertices - vertix = current_vertix, node = check if they are conected
+    for vertix, _node in enumerate(edge):
+
+      # If they are conected save their position
+      if  _node == 1:
+        if _from == None:
+          _from = vertix
+        else:
+          _to = vertix
+    
+    # Add edges to graph
+    if _from not in graph:
+      graph[_from] = [(_to, cost[_counter])]
+    else:
+      graph[_from].append((_to, cost[_counter]))
+
+    if _to not in graph:
+      graph[_to] = [(_from, -cost[_counter])]
+    else:
+      graph[_to].append((_from, -cost[_counter]))
+  
+  return graph
+
+# Implementation of Breadth First Search
+def bfs(graph, root, target=None):
+  edges=graph[root]
+  while(len(edges)> 0):
+    print(edges)
+    node, _ = edges.pop(0)
+    for edge, cost in graph[node]:
+      if cost<0: continue
+      edges.append((edge, cost))
   pass
+  
+
+    
+
