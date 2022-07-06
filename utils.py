@@ -22,11 +22,11 @@ def read_input(text=''):
     linha = [int(valor) for valor in linha]
     matrixQ.append(linha)
 
-  # Last line [-1] - cost of edges
-  cost = [int(valor) for valor in input().split(' ')]
+  # Last line [-1] - capacity of edges
+  capacity = [int(valor) for valor in input().split(' ')]
 
   # Make a graph
-  graph = gs.make_graph(matrixQ, cost, lines, columns)
+  graph = gs.make_graph(matrixQ, capacity, lines, columns)
   return graph
 
   

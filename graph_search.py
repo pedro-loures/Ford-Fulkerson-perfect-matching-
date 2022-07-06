@@ -17,7 +17,7 @@ import utils as ut
   0 0 1
   1 0 1
   0 1 0
-  2 3 5 # cost
+  2 3 5 # capacity
 
 {
   0 : [(2, 2), (3, 3)]
@@ -34,7 +34,7 @@ def assert_matrix(matrixQ):
 
 
 # make graph structure from the matrix given before (can be optimized)
-def make_graph(matrixQ, cost, lines=None, columns=None):
+def make_graph(matrixQ, capacity, lines=None, columns=None):
   np_matrixQ = np.array(matrixQ).transpose()
   graph = {}
   
@@ -55,14 +55,14 @@ def make_graph(matrixQ, cost, lines=None, columns=None):
     
     # Add edges to graph
     if _from not in graph:
-      graph[_from] = [(_to, cost[_counter])]
+      graph[_from] = [(_to, capacity[_counter])]
     else:
-      graph[_from].append((_to, cost[_counter]))
+      graph[_from].append((_to, capacity[_counter]))
 
     if _to not in graph:
-      graph[_to] = [(_from, cost[_counter])]
+      graph[_to] = [(_from, capacity[_counter])]
     else:
-      graph[_to].append((_from, cost[_counter]))
+      graph[_to].append((_from, capacity[_counter]))
   
   return graph
 
@@ -73,7 +73,7 @@ def make_bipartite(graph, root, target=None):
   red=[]
 
   # Prepare root edges
-  edges=[(root, *node_cost) for node_cost in graph[root]]
+  edges=[(root, *node_capacity) for node_capacity in graph[root]]
   graph[root].append('blue')
   blue.append(root)
 
@@ -96,11 +96,11 @@ def make_bipartite(graph, root, target=None):
     graph[current_node].append(color)
 
     # append the ones that hasnt been visited
-    for next_node, cost  in graph[current_node][:-1]:
+    for next_node, capacity  in graph[current_node][:-1]:
       if type(graph[next_node][-1]) == str:  # if already visited check if bipartite and skip (previous color == next_color)
         assert prev_color == graph[next_node][-1], "GRAPH MUST BE BIPARTITE:" + prev_color + "==" +  graph[next_node][-1]
         continue
-      edges.append((current_node, next_node, cost))
+      edges.append((current_node, next_node, capacity))
       
   # print(graph,red, blue)
   return red, blue

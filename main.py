@@ -21,7 +21,8 @@ import utils as ut
 
 def main():
   graph = ut.read_input()
-  gs.make_bipartite(graph, 0)
+  red, blue = gs.make_bipartite(graph, 0)
+  
   pass
 
 
