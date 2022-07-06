@@ -1,6 +1,7 @@
 # External imports
 import string
 from typing_extensions import assert_type
+from anyio import current_effective_deadline
 import numpy as np
 import scipy
 
@@ -16,7 +17,7 @@ import utils as ut
   0 0 1
   1 0 1
   0 1 0
-  2 3 5 # cost
+  2 3 5 # capacity
 
 {
   0 : [(2, 2), (3, 3)]
@@ -33,7 +34,7 @@ def assert_matrix(matrixQ):
 
 
 # make graph structure from the matrix given before (can be optimized)
-def make_graph(matrixQ, cost, lines=None, columns=None):
+def make_graph(matrixQ, capacity, lines=None, columns=None):
   np_matrixQ = np.array(matrixQ).transpose()
   graph = {}
   
@@ -54,50 +55,54 @@ def make_graph(matrixQ, cost, lines=None, columns=None):
     
     # Add edges to graph
     if _from not in graph:
-      graph[_from] = [(_to, cost[_counter])]
+      graph[_from] = [(_to, capacity[_counter], 0)]
     else:
-      graph[_from].append((_to, cost[_counter]))
+      graph[_from].append((_to, capacity[_counter], 0))
 
     if _to not in graph:
-      graph[_to] = [(_from, cost[_counter])]
+      graph[_to] = [(_from, capacity[_counter], 0)]
     else:
-      graph[_to].append((_from, cost[_counter]))
+      graph[_to].append((_from, capacity[_counter], 0))
   
-  return graph
+  return graph # node:[(edge_target, edge_capacity, zeroed_capacity), ..., edge]
 
 # Implementation of Breadth First Search
-def make_bipartite(graph, root, target=None):
-  print(graph)
+def make_bipartite(graph, root, return_graph=False, ):
+  
+  blue=[] # subset1
+  red=[]  # subset2
 
   # Prepare root edges
-  edges=[(root, *node_cost) for node_cost in graph[root]]
+  edges=[(root, *node_capacity) for node_capacity in graph[root]]
   graph[root].append('blue')
+  blue.append(root)
 
   # Pass through all the edges
   while(len(edges)> 0):
 
-    previous_node, current_node, _ = edges.pop(0) # current edge
-
-    assert type(graph[current_node][-1]) != str, "node " + str(current_node) + "already explored:" + str(graph[current_node]) # catch if repeating nodes
+    previous_node, current_node, _, _ = edges.pop(0) # current edge
     
-    prev_color = graph[previous_node][-1]  # update color of the next next_node
+    assert type(graph[current_node][-1]) != str, "node " + str(current_node) + "already explored:" + str(graph[current_node]) # catch if repeating nodes
+    prev_color = graph[previous_node][-1]  # get previous color
     assert type(prev_color) == str, "COLOR " + str(color) + " NOT A STRING"
-    if prev_color == 'red': color = 'blue'
-    else: color = 'red'
+    
+    # update color of the next next_node and add to group
+    if prev_color == 'red': 
+      color = 'blue' 
+      blue.append(current_node)
+    else: 
+      color = 'red'
+      red.append(current_node)
     graph[current_node].append(color)
 
-    # print(current_node, graph[current_node])
-
     # append the ones that hasnt been visited
-    for next_node, cost  in graph[current_node][:-1]:
+    for next_node, capacity, _  in graph[current_node][:-1]:
       if type(graph[next_node][-1]) == str:  # if already visited check if bipartite and skip (previous color == next_color)
         assert prev_color == graph[next_node][-1], "GRAPH MUST BE BIPARTITE:" + prev_color + "==" +  graph[next_node][-1]
         continue
-      edges.append((current_node, next_node, cost))
-      
-    
-  # print(graph)
-  return edges
+      edges.append((current_node, next_node, capacity, 0))
+  if return_graph: graph, red, blue
+  return red, blue # Equivalent to both sets
   
 
     
