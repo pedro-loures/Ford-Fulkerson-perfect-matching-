@@ -64,15 +64,21 @@ def make_graph(matrixQ, cost, lines=None, columns=None):
   return graph
 
 # Implementation of Breadth First Search
-def bfs(graph, root, target=None):
-  edges=graph[root]
+def make_bipartite(graph, root, target=None):
+  print(root, ':', graph[root], 'red')
+  edges=[(*node,'red') for node in  graph[root]]
   while(len(edges)> 0):
-    print(edges)
-    node, _ = edges.pop(0)
+
+    # print(edges)
+    node, _, color = edges.pop(0)
+    if color != 'red': color = 'red'
+    else: color = 'blue'
+    
+    print(node, ':', graph[node],color)
     for edge, cost in graph[node]:
       if cost<0: continue
-      edges.append((edge, cost))
-  pass
+      edges.append((edge, cost, color))
+  return edges
   
 
     

@@ -17,7 +17,9 @@ def read_input(text=''):
   # Second to Second to last [1:-1] - matrix
   matrixQ=[]
   for _ in range(lines*2):
-    linha = [int(valor) for valor in input().split(' ')]
+    linha = input().split(' ')
+    # print(linha)
+    linha = [int(valor) for valor in linha]
     matrixQ.append(linha)
 
   # Last line [-1] - cost of edges
@@ -26,4 +28,6 @@ def read_input(text=''):
   # Make a graph
   graph = gs.make_graph(matrixQ, cost, lines, columns)
   return graph
+
+  
 
