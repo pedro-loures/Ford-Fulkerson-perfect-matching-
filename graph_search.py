@@ -1,6 +1,7 @@
 # External imports
 import string
 from typing_extensions import assert_type
+from anyio import current_effective_deadline
 import numpy as np
 import scipy
 
@@ -67,26 +68,32 @@ def make_graph(matrixQ, cost, lines=None, columns=None):
 
 # Implementation of Breadth First Search
 def make_bipartite(graph, root, target=None):
-  print(graph)
+  
+  blue=[]
+  red=[]
 
   # Prepare root edges
   edges=[(root, *node_cost) for node_cost in graph[root]]
   graph[root].append('blue')
+  blue.append(root)
 
   # Pass through all the edges
   while(len(edges)> 0):
 
     previous_node, current_node, _ = edges.pop(0) # current edge
-
-    assert type(graph[current_node][-1]) != str, "node " + str(current_node) + "already explored:" + str(graph[current_node]) # catch if repeating nodes
     
-    prev_color = graph[previous_node][-1]  # update color of the next next_node
+    assert type(graph[current_node][-1]) != str, "node " + str(current_node) + "already explored:" + str(graph[current_node]) # catch if repeating nodes
+    prev_color = graph[previous_node][-1]  # get previous color
     assert type(prev_color) == str, "COLOR " + str(color) + " NOT A STRING"
-    if prev_color == 'red': color = 'blue'
-    else: color = 'red'
+    
+    # update color of the next next_node and add to group
+    if prev_color == 'red': 
+      color = 'blue' 
+      blue.append(current_node)
+    else: 
+      color = 'red'
+      red.append(current_node)
     graph[current_node].append(color)
-
-    # print(current_node, graph[current_node])
 
     # append the ones that hasnt been visited
     for next_node, cost  in graph[current_node][:-1]:
@@ -95,9 +102,8 @@ def make_bipartite(graph, root, target=None):
         continue
       edges.append((current_node, next_node, cost))
       
-    
-  # print(graph)
-  return edges
+  # print(graph,red, blue)
+  return red, blue
   
 
     
