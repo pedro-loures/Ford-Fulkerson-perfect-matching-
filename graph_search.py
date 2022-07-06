@@ -55,22 +55,22 @@ def make_graph(matrixQ, capacity, lines=None, columns=None):
     
     # Add edges to graph
     if _from not in graph:
-      graph[_from] = [(_to, capacity[_counter])]
+      graph[_from] = [(_to, capacity[_counter], 0)]
     else:
-      graph[_from].append((_to, capacity[_counter]))
+      graph[_from].append((_to, capacity[_counter], 0))
 
     if _to not in graph:
-      graph[_to] = [(_from, capacity[_counter])]
+      graph[_to] = [(_from, capacity[_counter], 0)]
     else:
-      graph[_to].append((_from, capacity[_counter]))
+      graph[_to].append((_from, capacity[_counter], 0))
   
-  return graph
+  return graph # node:[(edge_target, edge_capacity, zeroed_capacity), ..., edge]
 
 # Implementation of Breadth First Search
-def make_bipartite(graph, root, target=None):
+def make_bipartite(graph, root, return_graph=False, ):
   
-  blue=[]
-  red=[]
+  blue=[] # subset1
+  red=[]  # subset2
 
   # Prepare root edges
   edges=[(root, *node_capacity) for node_capacity in graph[root]]
@@ -80,7 +80,7 @@ def make_bipartite(graph, root, target=None):
   # Pass through all the edges
   while(len(edges)> 0):
 
-    previous_node, current_node, _ = edges.pop(0) # current edge
+    previous_node, current_node, _, _ = edges.pop(0) # current edge
     
     assert type(graph[current_node][-1]) != str, "node " + str(current_node) + "already explored:" + str(graph[current_node]) # catch if repeating nodes
     prev_color = graph[previous_node][-1]  # get previous color
@@ -96,14 +96,13 @@ def make_bipartite(graph, root, target=None):
     graph[current_node].append(color)
 
     # append the ones that hasnt been visited
-    for next_node, capacity  in graph[current_node][:-1]:
+    for next_node, capacity, _  in graph[current_node][:-1]:
       if type(graph[next_node][-1]) == str:  # if already visited check if bipartite and skip (previous color == next_color)
         assert prev_color == graph[next_node][-1], "GRAPH MUST BE BIPARTITE:" + prev_color + "==" +  graph[next_node][-1]
         continue
-      edges.append((current_node, next_node, capacity))
-      
-  # print(graph,red, blue)
-  return red, blue
+      edges.append((current_node, next_node, capacity, 0))
+  if return_graph: graph, red, blue
+  return red, blue # Equivalent to both sets
   
 
     
