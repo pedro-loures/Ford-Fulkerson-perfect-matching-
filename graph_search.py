@@ -55,16 +55,16 @@ def make_graph(matrixQ, capacity, lines=None, columns=None):
     
     # Add edges to graph
     if _from not in graph:
-      graph[_from] = [(_to, capacity[_counter], 0)]
+      graph[_from] = [(_to, capacity[_counter], capacity[_counter])]
     else:
-      graph[_from].append((_to, capacity[_counter], 0))
+      graph[_from].append((_to, capacity[_counter], capacity[_counter]))
 
     if _to not in graph:
-      graph[_to] = [(_from, capacity[_counter], 0)]
+      graph[_to] = [(_from, capacity[_counter], capacity[_counter])]
     else:
-      graph[_to].append((_from, capacity[_counter], 0))
+      graph[_to].append((_from, capacity[_counter], capacity[_counter]))
   
-  return graph # node:[(edge_target, edge_capacity, zeroed_capacity), ..., edge]
+  return graph # node:[(edge_target, edge_capacity, remaining_capacity), ..., edge]
 
 # Implementation of Breadth First Search
 def make_bipartite(graph, root, return_graph=False, ):
@@ -100,10 +100,47 @@ def make_bipartite(graph, root, return_graph=False, ):
       if type(graph[next_node][-1]) == str:  # if already visited check if bipartite and skip (previous color == next_color)
         assert prev_color == graph[next_node][-1], "GRAPH MUST BE BIPARTITE:" + prev_color + "==" +  graph[next_node][-1]
         continue
-      edges.append((current_node, next_node, capacity, 0))
-  if return_graph: graph, red, blue
+      edges.append((current_node, next_node, capacity, capacity))
+  if return_graph: return graph, red, blue
   return red, blue # Equivalent to both sets
   
 
+def bfs_flux(graph, root, target):
+  graph_ = graph.copy()
+  edges=[(root, *node_capacity) for node_capacity in graph[root][:-1]]
+  flux = [[edge[1]] for edge in edges]
+  visited = []
+
+  print(graph_)
+  print(edges)
+  # print(flux)
+  while len(edges) > 0:
+    previous_node, current_node, _, _ = edges.pop(0)
+
+    for next_node, total_cap, remaining_cap  in graph[current_node][:-1]:
+      print(current_node, graph_[current_node])
+      if remaining_cap > 0 and next_node not in visited:
+        edges.append((current_node, next_node, total_cap, remaining_cap))
     
+        # Add to flux
+        for i, flux_i in enumerate(flux):
+          if current_node in flux_i: flux[i].append(next_node)
+        # Add to visited
+        visited.append(next_node)
+        # Check if target
+        if next_node == target:
+          break
+        # update graph
+        for index, edge in enumerate(graph_[current_node]):
+          if edge[0] == next_node:
+            graph_[current_node][index] = (next_node, total_cap, remaining_cap-1)
+
+  print(flux)
+  print(graph_)
+
+
+
+
+  pass
+
 
